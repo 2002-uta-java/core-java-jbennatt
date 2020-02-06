@@ -1,12 +1,12 @@
 package com.revature.eval.java.core;
 
 import java.time.Duration;
+
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
-import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -886,6 +886,8 @@ public class EvaluationService {
 
 		char c = string.charAt(len - 1);
 
+		// handle fence post (get first--really last--digit) then below every subsequent
+		// digit is guaranteed to have a "previous" (which is really the next digit).
 		if (Character.isDigit(c))
 			sum += doubleLuhnNumber(c);
 		else
@@ -963,7 +965,7 @@ public class EvaluationService {
 				final String left = string.substring(0, front).trim();
 				final String right = string.substring(front + OPERATORS[i].length()).trim();
 
-				try {
+				if (left.matches("^-?\\d+$") && right.matches("^-?\\d+$")) {
 					final int a = Integer.parseInt(left);
 					final int b = Integer.parseInt(right);
 
@@ -979,7 +981,7 @@ public class EvaluationService {
 					default:
 						throw new IllegalArgumentException("unknown operation"); // this shouldn't happen
 					}
-				} catch (NumberFormatException nfe) {
+				} else {
 					// this means you couldn't properly parse the left or right number
 					throw new IllegalArgumentException("Invalid input: arguments are not integers: " + string);
 				}
