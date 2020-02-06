@@ -1,9 +1,7 @@
 package com.revature.eval.java.core;
 
-import java.lang.management.OperatingSystemMXBean;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.temporal.Temporal;
@@ -45,24 +43,14 @@ public class EvaluationService {
 	 */
 	public String acronym(String phrase) {
 		phrase = phrase.toUpperCase();
-		final StringBuilder ack = new StringBuilder();
-		final int len = phrase.length();
-		boolean looking = true;
+		final String[] words = phrase.split("[^\\p{Alpha}]+");
+		final char[] ack = new char[words.length];
 
-		for (int i = 0; i < len; ++i) {
-			final char c = phrase.charAt(i);
-
-			if (Character.isAlphabetic(c)) {
-				if (looking) {
-					ack.append(c);
-					looking = false;
-				}
-			} else {
-				looking = true;
-			}
+		for (int i = 0; i < ack.length; i++) {
+			ack[i] = words[i].charAt(0);
 		}
 
-		return ack.toString();
+		return new String(ack);
 	}
 
 	/**
