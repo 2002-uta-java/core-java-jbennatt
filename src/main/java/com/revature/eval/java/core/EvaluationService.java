@@ -326,31 +326,72 @@ public class EvaluationService {
 		private List<T> sortedList;
 
 		public int indexOf(T t) {
+			// List cannot contain a null object (this cannot be sorted)
 			if (t == null)
 				return -1;
 
+			// left and right represent the current search range, which is initially the
+			// entire list. left is the first index to be searched and right one past the
+			// last index to be searched--in this way, right - left represents the number of
+			// elements in this range.
 			int left = 0;
 			int right = sortedList.size();
 
-			while (right - left > 1) {
+			// I'm going to test left, mid, and right, which means that we need at least
+			// three values in the range
+			while (right - left > 2) {
+				// see if left or right item is this (this helps prevent worst case where it's
+				// the first or last item)
+				final int leftRightTest = indexOfLeftRight(t, left, right - 1);
+				if (leftRightTest >= 0)
+					return leftRightTest;
+
+				// find the middle by taking the average of left and right
 				final int middleIndex = (left + right) / 2;
 				final T middleItem = sortedList.get(middleIndex);
-				if (middleItem.equals(t))
+
+				// store the comparison for the middle term since this will decide whether or
+				// not we go left or right
+				final int cmp = t.compareTo(middleItem);
+
+				// if cmp is zero, middleTerm is equal to t, just return middleIndex
+				if (cmp == 0)
 					return middleIndex;
 
-				// else
-				if (t.compareTo(middleItem) < 0) {
-					// search left
+				// go left or right depending on cmp
+				if (cmp < 0) {// search left
+					// we just eliminated the current left, so increment left
+					++left;
 					right = middleIndex;
-				} else {
-					// search right
+				} else {// search right
+					// we just eliminated right, so decrement right
+					--right;
 					left = middleIndex + 1;
 				}
 			}
 
-			if (left < sortedList.size())
-				return sortedList.get(left).equals(t) ? left : -1;
-			// else it's out of bounds, it wasn't found
+			if (right - left == 2) {
+				// need to check left and right
+				final int index = indexOfLeftRight(t, left, right - 1);
+				if (index >= 0)
+					return index;
+			} else if (right - left == 1) {
+				// just need to check left
+				if (sortedList.get(left).equals(t))
+					return left;
+			}
+			// else t was never found
+			return -1;
+		}
+
+		private int indexOfLeftRight(T t, final int left, final int right) {
+			// test to see if any three of the indexes are the element we're searching for.
+			// If so, return that index.
+			if (sortedList.get(left).equals(t))
+				return left;
+			if (sortedList.get(right).equals(t))
+				return right;
+
 			return -1;
 		}
 
