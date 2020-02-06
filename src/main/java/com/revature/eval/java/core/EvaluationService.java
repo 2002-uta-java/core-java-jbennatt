@@ -650,7 +650,9 @@ public class EvaluationService {
 				// AND we must be at the end of the string
 				if (count != 9 || i != len - 1)
 					return false;
-				sum += (count++) * 10;
+				// I know count must now be 10, which means I just add (1 * 10)
+				sum += 10;
+				count = 10; // just set count to 10
 			} else if (c != '-') // anything other than dashes are not permitted
 				return false;
 
