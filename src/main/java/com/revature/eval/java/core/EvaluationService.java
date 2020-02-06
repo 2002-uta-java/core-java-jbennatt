@@ -635,7 +635,8 @@ public class EvaluationService {
 				} else {
 					return (char) ('z' - (c - 'a'));
 				}
-			}
+			} else if (Character.isDigit(c))
+				return c;
 			return 0;
 		}
 	}
