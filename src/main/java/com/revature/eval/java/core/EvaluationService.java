@@ -224,17 +224,39 @@ public class EvaluationService {
 	 */
 	public Map<String, Integer> wordCount(String string) {
 		final Map<String, Integer> wordCount = new HashMap<String, Integer>();
+		StringBuilder word = new StringBuilder();
 
-		final String[] words = string.split("\\s");
+		final int len = string.length();
 
-		for (final String word : words) {
-			final Integer count = wordCount.get(word);
+		for (int i = 0; i < len; ++i) {
+			final char c = string.charAt(i);
 
-			if (count == null) {
-				wordCount.put(word, 1);
-			} else {
-				wordCount.put(word, count + 1);
+			if (Character.isAlphabetic(c)) {
+				word.append(c);
+			} else if (word.length() > 0) {
+
+				final String wordStr = word.toString();
+				final Integer count = wordCount.get(wordStr);
+
+				if (count == null)
+					wordCount.put(wordStr, 1);
+				else
+					wordCount.put(wordStr, count + 1);
+
+				// clear stringbuilder
+				word.delete(0, word.length());
 			}
+		}
+
+		if (word.length() > 0) {
+			// process last word
+			final String wordStr = word.toString();
+			final Integer count = wordCount.get(wordStr);
+
+			if (count == null)
+				wordCount.put(wordStr, 1);
+			else
+				wordCount.put(wordStr, count + 1);
 		}
 
 		return wordCount;
@@ -482,6 +504,9 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int calculateNthPrime(int i) {
+		if (i <= 0)
+			throw new IllegalArgumentException("The nth prime must be a natural number, not " + i);
+
 		final List<Integer> primes = new ArrayList<Integer>(i);
 
 		for (int count = 0; count < i; ++count)
@@ -579,6 +604,10 @@ public class EvaluationService {
 		}
 	}
 
+//	public static boolean isLetter(final char c) {
+//		return (c <= 'z' && c >= 'a') || (c <= 'Z' && c >= 'A');
+//	}
+
 	/**
 	 * 15. The ISBN-10 verification process is used to validate book identification
 	 * numbers. These normally contain dashes and look like: 3-598-21508-8
@@ -602,7 +631,43 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isValidIsbn(String string) {
-		// TODO Write an implementation for this method declaration
+		int sum = 0;
+		int count = 0;
+		final int len = string.length();
+
+		// check that first character is a digit
+		if (!Character.isDigit(string.charAt(0)))
+			return false;
+
+		for (int i = 0; i < len; ++i) {
+			final char c = string.charAt(i);
+			if (Character.isDigit(c)) {
+				// add to the sum
+				sum += (10 - count++) * (c - '0');
+			} else if (c == 'X' || c == 'x') {
+				// 'x' can only come at the end of the string
+				// count must currently be 9 (so that the next is 10)
+				// AND we must be at the end of the string
+				if (count != 9 || i != len - 1)
+					return false;
+				sum += (count++) * 10;
+			} else if (c != '-') // anything other than dashes are not permitted
+				return false;
+
+			// if count gets above 10, we have a mistake
+			if (count > 10)
+				return false;
+			// check count, if it's 10, then we should be at the end of the list. If it is
+			// and we're not, this isn't valid.
+			if (count == 10 && i != len - 1)
+				return false;
+		}
+
+		// if we get through the above loop, then we've 1) never seen an invalid
+		// character and 2) count is <= 10. If it IS < 10, this isn't valid.
+		if (count == 10)
+			return sum % 11 == 0;
+		// else this failed
 		return false;
 	}
 
