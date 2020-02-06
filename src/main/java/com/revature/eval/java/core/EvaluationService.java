@@ -1,14 +1,19 @@
 package com.revature.eval.java.core;
 
-import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Year;
+import java.time.YearMonth;
 import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
 
 public class EvaluationService {
 
@@ -211,14 +216,14 @@ public class EvaluationService {
 	public String cleanPhoneNumber(String string) {
 		final char[] clean = new char[10];
 		int index = 9;
-		boolean lastDelim = false;
-		boolean closeParen = false;
+//		boolean lastDelim = false;
+//		boolean closeParen = false;
 
 		for (int i = string.length() - 1; i >= 0; --i) {
 			final char c = string.charAt(i);
 
 			if (Character.isDigit(c)) {
-				lastDelim = false;
+//				lastDelim = false;
 				// it's OK if index is -1 AND c is 1, but if index goes any smaller or this
 				// digit isn't 1, then this is wrong
 				if (index < -1)
@@ -230,35 +235,17 @@ public class EvaluationService {
 					// else it's fine, just skip it
 				} else // else keep adding to clean phone number
 					clean[index--] = c;
-			} else {
-				// handle valid non-digits
-				// 1. if lastDelim is true, there shouldn't be another delimiter
-
-				// there can be a lastDelim (i.e. last thing we saw was a delimiter) if this is
-				// the beginning of the closing parenthesis
-				if (closeParen) {
-					if (c != '(')
-						throw new IllegalArgumentException("Invalid phone number: " + string);
-					closeParen = false; // otherwise it's fine
-				} else if (c == ')') {
-					// this is fine, just make closeParen true
-					closeParen = true;
-				} else if (lastDelim) // haven't hit closeParen yet
-					throw new IllegalArgumentException(
-							"Invalid phone number: too many spacers between digits: " + string);
-				else if (isValidPhoneDelimiter(c)) {
-					lastDelim = true;
-				} else {
-					throw new IllegalArgumentException("Invalid phone number: " + string);
-				}
+			} else if (!isValidPhoneDelimiter(c)) {
+				throw new IllegalArgumentException("Invalid number: non-numerical: " + string);
 			}
 		}
 
 		return new String(clean);
+
 	}
 
 	public static boolean isValidPhoneDelimiter(final char c) {
-		return c == ' ' || c == '.' || c == '-';
+		return c == ' ' || c == '.' || c == '-' || c == '(' || c == ')';
 	}
 
 	/**
@@ -775,14 +762,41 @@ public class EvaluationService {
 	/**
 	 * 17. Calculate the moment when someone has lived for 10^9 seconds.
 	 * 
-	 * A gigasecond is 109 (1,000,000,000) seconds.
+	 * A gigasecond is 10^9 (1,000,000,000) seconds.
 	 * 
 	 * @param given
 	 * @return
 	 */
 	public Temporal getGigasecondDate(Temporal given) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		final TemporalAmount gigasecond = Duration.ofSeconds(1000000000l);
+
+		try {
+			return given.plus(gigasecond);
+		} catch (UnsupportedTemporalTypeException utte) {
+			// so basically we're going to try and get the Temporal objects
+			// without second-time precision to a representation that does
+			// namely, LocalDateTime
+
+			if (given instanceof LocalDate) {
+				// convert to second precision of LocalDateTime (assume we're starting from the
+				// start of the day)
+				// this is sort of the "base" case (this should return a value because this is a
+				// LocalDateTime).
+				return getGigasecondDate(((LocalDate) given).atStartOfDay());
+			} else if (given instanceof Year) {
+				// convert to a LocalDate (day 1 of the year)
+				return getGigasecondDate(((Year) given).atDay(1));
+
+				// this will throw an exception, then be handled by the above case
+			} else if (given instanceof YearMonth) {
+				// similar to above, this will return a LocalDate which will then be handled by
+				// this first case.
+				return getGigasecondDate(((YearMonth) given).atDay(1));
+			}
+
+			// if none of these handle the exception, I give up
+			throw utte;
+		}
 	}
 
 	/**
