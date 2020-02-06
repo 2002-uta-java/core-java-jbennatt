@@ -1,5 +1,6 @@
 package com.revature.eval.java.core;
 
+import java.lang.management.OperatingSystemMXBean;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -865,9 +866,57 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isLuhnValid(String string) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		// remove all white space
+		string = string.replaceAll("\\s", "");
+
+		// needs to be more than one digit (if there is only one digit but also invalid
+		// characters it will fail below)
+		if (string.length() <= 1)
+			return false;
+
+		final int len = string.length();
+
+		int sum = 0;
+
+		char c = string.charAt(len - 1);
+
+		if (Character.isDigit(c))
+			sum += doubleLuhnNumber(c);
+		else
+			return false; // found an invalid character
+
+		for (int i = len - 3; i >= 0; i -= 2) {
+			// check the previous character
+			final char cPrev = string.charAt(i + 1);
+			if (Character.isDigit(cPrev))
+				sum += c - '0';
+			else
+				return false;
+
+			c = string.charAt(i);
+
+			if (Character.isDigit(c))
+				sum += doubleLuhnNumber(c);
+			else
+				return false;
+		}
+
+		return sum % 10 == 0;
 	}
+
+	// this assumes c is a valid digit
+	private static int doubleLuhnNumber(final char c) {
+		final int n = 2 * (c - '0');
+		return n >= 10 ? n - 9 : n;
+	}
+
+	// these hold the indexes into the OPERATORS array of the strings (this makes
+	// figuring out which operation to do easier)
+	public static final int PLUS = 0;
+	public static final int MINUS = 1;
+	public static final int MULT = 2;
+	public static final int DIVIDE = 3;
+	public static final String[] OPERATORS = { "plus", "minus", "multiplied by", "divided by" };
 
 	/**
 	 * 20. Parse and evaluate simple math word problems returning the answer as an
@@ -897,8 +946,41 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int solveWordProblem(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		string = string.toLowerCase();
+		// remove "what is" from the beginning (hopefully anyway) and the question mark
+		string = string.replace("what is", "");
+		string = string.replace("?", "");
+		for (int i = 0; i < OPERATORS.length; ++i) {
+			final int front = string.indexOf(OPERATORS[i]);
+
+			if (front >= 0) {
+				final String left = string.substring(0, front).trim();
+				final String right = string.substring(front + OPERATORS[i].length()).trim();
+
+				try {
+					final int a = Integer.parseInt(left);
+					final int b = Integer.parseInt(right);
+
+					switch (i) {
+					case PLUS:
+						return a + b;
+					case MINUS:
+						return a - b;
+					case MULT:
+						return a * b;
+					case DIVIDE:
+						return a / b;
+					default:
+						throw new IllegalArgumentException("unknown operation"); // this shouldn't happen
+					}
+				} catch (NumberFormatException nfe) {
+					// this means you couldn't properly parse the left or right number
+					throw new IllegalArgumentException("Invalid input: arguments are not integers: " + string);
+				}
+			}
+		}
+
+		throw new IllegalArgumentException("Invalid input: unrecognized operator: " + string);
 	}
 
 }
