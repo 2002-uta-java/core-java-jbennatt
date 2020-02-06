@@ -573,12 +573,25 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String encode(String string) {
-			final char[] encoded = new char[string.length()];
+			final StringBuilder encoded = new StringBuilder();
+			final int len = string.length();
+			int letterCount = 0;
 
-			for (int i = 0; i < encoded.length; ++i)
-				encoded[i] = switchChar(string.charAt(i));
+			for (int i = 0; i < len; ++i) {
+				final char encodedC = switchChar(string.charAt(i));
 
-			return new String(encoded);
+				if (encodedC != 0) {
+					// don't add a space until the next alpha character is found
+					if (letterCount == 5) {
+						letterCount = 0;
+						encoded.append(' ');
+					}
+					encoded.append(encodedC);
+					++letterCount;
+				}
+			}
+
+			return encoded.toString();
 		}
 
 		/**
@@ -588,19 +601,28 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String decode(String string) {
-			return encode(string);
+			final StringBuilder encoded = new StringBuilder();
+			final int len = string.length();
+
+			for (int i = 0; i < len; ++i) {
+				final char encodedC = switchChar(string.charAt(i));
+				if (encodedC != 0) {
+					encoded.append(encodedC);
+				}
+			}
+
+			return encoded.toString();
 		}
 
 		public static char switchChar(final char c) {
 			if (Character.isAlphabetic(c)) {
 				if (Character.isUpperCase(c)) {
-					return (char) ('Z' - (c - 'A'));
+					return (char) ('z' - (c - 'A'));
 				} else {
 					return (char) ('z' - (c - 'a'));
 				}
 			}
-			// else don't encode
-			return c;
+			return 0;
 		}
 	}
 
