@@ -418,7 +418,7 @@ public class EvaluationService {
 				l /= test;
 				while (l % test == 0) {
 					l /= test;
-//					list.add(test);
+					list.add(test);
 				}
 
 				// update stop because you don't need to go to the original square root anymore,
