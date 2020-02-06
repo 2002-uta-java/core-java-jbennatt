@@ -527,6 +527,8 @@ public class EvaluationService {
 
 	}
 
+	private List<Integer> primes = new ArrayList<Integer>();
+
 	/**
 	 * 12. Given a number n, determine what the nth prime is.
 	 * 
@@ -543,9 +545,12 @@ public class EvaluationService {
 		if (i <= 0)
 			throw new IllegalArgumentException("The nth prime must be a natural number, not " + i);
 
-		final List<Integer> primes = new ArrayList<Integer>(i);
+//		final List<Integer> primes = new ArrayList<Integer>(i);
 
-		for (int count = 0; count < i; ++count)
+		if (i <= primes.size())
+			return primes.get(i - 1);
+
+		for (int count = primes.size(); count < i; ++count)
 			primes.add(nextPrime(primes));
 
 		return primes.get(i - 1);
