@@ -24,9 +24,12 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String reverse(String string) {
+		// create char array of the lenghth of the string
 		final char[] str = new char[string.length()];
 
+		// go forward through char array
 		for (int i = 0; i < str.length; ++i) {
+			// go backwards through string
 			str[i] = string.charAt(str.length - 1 - i);
 		}
 
@@ -42,10 +45,16 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String acronym(String phrase) {
+		// convert to upper case so that acronyms will be capitalized
 		phrase = phrase.toUpperCase();
+
+		// split on all non-alpha characters
 		final String[] words = phrase.split("[^\\p{Alpha}]+");
+
+		// the acronym will be the length of the number of words
 		final char[] ack = new char[words.length];
 
+		// add first character of each word to acryonym
 		for (int i = 0; i < ack.length; i++) {
 			ack[i] = words[i].charAt(0);
 		}
@@ -102,14 +111,18 @@ public class EvaluationService {
 			this.sideThree = sideThree;
 		}
 
+		// all three sides should be equal (you transitive property to only test 1 and
+		// 2, then 2 and 3)
 		public boolean isEquilateral() {
 			return sideOne == sideTwo && sideTwo == sideThree;
 		}
 
+		// test for all combinations of two sides (total of three)
 		public boolean isIsosceles() {
 			return sideOne == sideTwo || sideOne == sideThree || sideTwo == sideThree;
 		}
 
+		// test for all combinations of two sides (total of three)
 		public boolean isScalene() {
 			return sideOne != sideTwo && sideOne != sideThree && sideTwo != sideThree;
 		}
@@ -132,16 +145,26 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getScrabbleScore(String string) {
+		// convert to upper case because that's how I wrote the switch statement below
 		final String upper = string.toUpperCase();
+
 		int score = 0;
 		final int len = string.length();
 
-		for (int i = 0; i < len; ++i)
-			score += getScrabbleScore(upper.charAt(i));
+		// iterate through each character in string
+		for (int i = 0; i < len; ++i) {
+			final char c = upper.charAt(i);
+			if (Character.isAlphabetic(c))
+				score += getScrabbleScore(c);
+			else
+				throw new IllegalArgumentException("Invalid Scrabble word (contains non-alpha characters): " + string);
+		}
 
 		return score;
 	}
 
+	// helper method which computes the value for each scrabble letter (assumes it's
+	// a valid character)
 	private static int getScrabbleScore(final char c) {
 		switch (c) {
 		case 'D':
@@ -166,7 +189,7 @@ public class EvaluationService {
 		case 'Q':
 		case 'Z':
 			return 10;
-		default:
+		default: // default is the rest of the alphabet
 			return 1;
 		}
 	}
@@ -203,19 +226,28 @@ public class EvaluationService {
 	 * NANP-countries, only 1 is considered a valid country code.
 	 */
 	public String cleanPhoneNumber(String string) {
+		// a valid clean number will have exactly 10 digits
 		final char[] clean = new char[10];
+
+		// going to run this backwards, so "first" index will be the last
 		int index = 9;
 
+		// go backwards through string
 		for (int i = string.length() - 1; i >= 0; i--) {
 			final char c = string.charAt(i);
 
 			if (Character.isDigit(c)) {
+				// if index has become negative, there are too many digits in this number
 				if (index < 0) {
 					if (c != '1' || index < -1)
 						throw new IllegalArgumentException("Invalid Phone Number (too many digits): " + string);
+					// UNLESS that extra digit is 1 AND index == -1
 				}
+				// add this digit to the clean number
 				clean[index--] = c;
 			}
+			// else just skip non-digits (don't worry about any strange formatting. Just
+			// looking for 10 digits (or 11 with a leading 1)
 		}
 
 		// if index is anything but -1 (meaning index = 0 was the last index set), then
@@ -225,10 +257,6 @@ public class EvaluationService {
 
 		return new String(clean);
 	}
-
-//	public static boolean isValidPhoneDelimiter(final char c) {
-//		return c == ' ' || c == '.' || c == '-' || c == '(' || c == ')';
-//	}
 
 	/**
 	 * 6. Given a phrase, count the occurrences of each word in that phrase.
