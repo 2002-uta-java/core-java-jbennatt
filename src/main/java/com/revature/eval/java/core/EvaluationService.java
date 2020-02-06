@@ -38,16 +38,25 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String acronym(String phrase) {
-		// split string on white space (\s is whitespace in Java's regex)
-		final String[] words = phrase.split("\\s");
+		phrase = phrase.toUpperCase();
+		final StringBuilder ack = new StringBuilder();
+		final int len = phrase.length();
+		boolean looking = true;
 
-		String acronym = "";
+		for (int i = 0; i < len; ++i) {
+			final char c = phrase.charAt(i);
 
-		for (final String word : words) {
-			acronym += word.charAt(0);
+			if (Character.isAlphabetic(c)) {
+				if (looking) {
+					ack.append(c);
+					looking = false;
+				}
+			} else {
+				looking = true;
+			}
 		}
 
-		return acronym;
+		return ack.toString();
 	}
 
 	/**
