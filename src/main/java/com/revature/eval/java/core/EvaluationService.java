@@ -129,12 +129,12 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getScrabbleScore(String string) {
-//		final String upper = string.toUpperCase();
+		final String upper = string.toUpperCase();
 		int score = 0;
 		final int len = string.length();
 
 		for (int i = 0; i < len; ++i)
-			score += getScrabbleScore(string.charAt(i));
+			score += getScrabbleScore(upper.charAt(i));
 
 		return score;
 	}

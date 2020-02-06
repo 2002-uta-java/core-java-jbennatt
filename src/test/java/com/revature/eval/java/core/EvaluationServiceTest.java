@@ -475,6 +475,7 @@ public class EvaluationServiceTest {
 	@Test
 	public void testEncodeMindBlowingly() {
 		assertEquals("nrmwy oldrm tob", EvaluationService.AtbashCipher.encode("mindblowingly"));
+//		assertEquals("nrmwyoldrmtob", EvaluationService.AtbashCipher.encode("mindblowingly"));
 	}
 
 	@Test
