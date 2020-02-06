@@ -211,21 +211,46 @@ public class EvaluationService {
 	public String cleanPhoneNumber(String string) {
 		final char[] clean = new char[10];
 		int index = 9;
+		boolean lastDelim = false;
+		boolean closeParen = false;
 
 		for (int i = string.length() - 1; i >= 0; --i) {
 			final char c = string.charAt(i);
 
 			if (Character.isDigit(c)) {
+				lastDelim = false;
 				// it's OK if index is -1 AND c is 1, but if index goes any smaller or this
 				// digit isn't 1, then this is wrong
 				if (index < -1)
-					throw new IllegalArgumentException("Invalid phone number, too many digits");
+					throw new IllegalArgumentException(
+							"Invalid phone number, too many digits (should be 10 or 11 wih country code): " + string);
 				if (index == -1) {
 					if (c != '1')
-						throw new IllegalArgumentException("Invalid country code, must be 1");
+						throw new IllegalArgumentException("Invalid country code (must be 1): " + string);
 					// else it's fine, just skip it
 				} else // else keep adding to clean phone number
 					clean[index--] = c;
+			} else {
+				// handle valid non-digits
+				// 1. if lastDelim is true, there shouldn't be another delimiter
+
+				// there can be a lastDelim (i.e. last thing we saw was a delimiter) if this is
+				// the beginning of the closing parenthesis
+				if (closeParen) {
+					if (c != '(')
+						throw new IllegalArgumentException("Invalid phone number: " + string);
+					closeParen = false; // otherwise it's fine
+				} else if (c == ')') {
+					// this is fine, just make closeParen true
+					closeParen = true;
+				} else if (lastDelim) // haven't hit closeParen yet
+					throw new IllegalArgumentException(
+							"Invalid phone number: too many spacers between digits: " + string);
+				else if (isValidPhoneDelimiter(c)) {
+					lastDelim = true;
+				} else {
+					throw new IllegalArgumentException("Invalid phone number: " + string);
+				}
 			}
 		}
 
@@ -233,7 +258,7 @@ public class EvaluationService {
 	}
 
 	public static boolean isValidPhoneDelimiter(final char c) {
-		return c == ' ' || c == '.' || c == '-' || c == '(' || c == ')' || c == '+';
+		return c == ' ' || c == '.' || c == '-';
 	}
 
 	/**
