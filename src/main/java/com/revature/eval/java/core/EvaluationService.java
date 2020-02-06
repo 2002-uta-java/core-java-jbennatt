@@ -226,9 +226,9 @@ public class EvaluationService {
 		return new String(clean);
 	}
 
-	public static boolean isValidPhoneDelimiter(final char c) {
-		return c == ' ' || c == '.' || c == '-' || c == '(' || c == ')';
-	}
+//	public static boolean isValidPhoneDelimiter(final char c) {
+//		return c == ' ' || c == '.' || c == '-' || c == '(' || c == ')';
+//	}
 
 	/**
 	 * 6. Given a phrase, count the occurrences of each word in that phrase.
