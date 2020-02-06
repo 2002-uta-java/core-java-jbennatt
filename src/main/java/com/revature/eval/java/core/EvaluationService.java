@@ -205,32 +205,25 @@ public class EvaluationService {
 	public String cleanPhoneNumber(String string) {
 		final char[] clean = new char[10];
 		int index = 9;
-//		boolean lastDelim = false;
-//		boolean closeParen = false;
 
-		for (int i = string.length() - 1; i >= 0; --i) {
+		for (int i = string.length() - 1; i >= 0; i--) {
 			final char c = string.charAt(i);
 
 			if (Character.isDigit(c)) {
-//				lastDelim = false;
-				// it's OK if index is -1 AND c is 1, but if index goes any smaller or this
-				// digit isn't 1, then this is wrong
-				if (index < -1)
-					throw new IllegalArgumentException(
-							"Invalid phone number, too many digits (should be 10 or 11 wih country code): " + string);
-				if (index == -1) {
-					if (c != '1')
-						throw new IllegalArgumentException("Invalid country code (must be 1): " + string);
-					// else it's fine, just skip it
-				} else // else keep adding to clean phone number
-					clean[index--] = c;
-			} else if (!isValidPhoneDelimiter(c)) {
-				throw new IllegalArgumentException("Invalid number: non-numerical: " + string);
+				if (index < 0) {
+					if (c != '1' || index < -1)
+						throw new IllegalArgumentException("Invalid Phone Number (too many digits): " + string);
+				}
+				clean[index--] = c;
 			}
 		}
 
-		return new String(clean);
+		// if index is anything but -1 (meaning index = 0 was the last index set), then
+		// there weren't enough digits
+		if (index != -1)
+			throw new IllegalArgumentException("Invalid Phone Number (not enough numbers): " + string);
 
+		return new String(clean);
 	}
 
 	public static boolean isValidPhoneDelimiter(final char c) {
