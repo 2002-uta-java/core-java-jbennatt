@@ -1,8 +1,14 @@
 package com.revature.eval.java.core;
 
+import java.io.IOException;
 import java.time.temporal.Temporal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
 
 public class EvaluationService {
 
@@ -14,8 +20,13 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String reverse(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		final char[] str = new char[string.length()];
+
+		for (int i = 0; i < str.length; ++i) {
+			str[i] = string.charAt(str.length - 1 - i);
+		}
+
+		return new String(str);
 	}
 
 	/**
@@ -27,8 +38,16 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String acronym(String phrase) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		// split string on white space (\s is whitespace in Java's regex)
+		final String[] words = phrase.split("\\s");
+
+		String acronym = "";
+
+		for (final String word : words) {
+			acronym += word.charAt(0);
+		}
+
+		return acronym;
 	}
 
 	/**
@@ -81,18 +100,15 @@ public class EvaluationService {
 		}
 
 		public boolean isEquilateral() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			return sideOne == sideTwo && sideTwo == sideThree;
 		}
 
 		public boolean isIsosceles() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			return sideOne == sideTwo || sideOne == sideThree || sideTwo == sideThree;
 		}
 
 		public boolean isScalene() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			return sideOne != sideTwo && sideOne != sideThree && sideTwo != sideThree;
 		}
 
 	}
@@ -113,8 +129,43 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getScrabbleScore(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+//		final String upper = string.toUpperCase();
+		int score = 0;
+		final int len = string.length();
+
+		for (int i = 0; i < len; ++i)
+			score += getScrabbleScore(string.charAt(i));
+
+		return score;
+	}
+
+	private static int getScrabbleScore(final char c) {
+		switch (c) {
+		case 'D':
+		case 'G':
+			return 2;
+		case 'B':
+		case 'C':
+		case 'M':
+		case 'P':
+			return 3;
+		case 'F':
+		case 'H':
+		case 'V':
+		case 'W':
+		case 'Y':
+			return 4;
+		case 'K':
+			return 5;
+		case 'J':
+		case 'X':
+			return 8;
+		case 'Q':
+		case 'Z':
+			return 10;
+		default:
+			return 1;
+		}
 	}
 
 	/**
@@ -149,8 +200,17 @@ public class EvaluationService {
 	 * NANP-countries, only 1 is considered a valid country code.
 	 */
 	public String cleanPhoneNumber(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		final char[] clean = new char[10];
+		int index = 9;
+
+		for (int i = string.length() - 1; index >= 0 && i >= 0; --i) {
+			final char c = string.charAt(i);
+
+			if (Character.isDigit(c))
+				clean[index--] = c;
+		}
+
+		return new String(clean);
 	}
 
 	/**
@@ -163,8 +223,21 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		final Map<String, Integer> wordCount = new HashMap<String, Integer>();
+
+		final String[] words = string.split("\\s");
+
+		for (final String word : words) {
+			final Integer count = wordCount.get(word);
+
+			if (count == null) {
+				wordCount.put(word, 1);
+			} else {
+				wordCount.put(word, count + 1);
+			}
+		}
+
+		return wordCount;
 	}
 
 	/**
@@ -202,12 +275,36 @@ public class EvaluationService {
 	 * binary search is a dichotomic divide and conquer search algorithm.
 	 * 
 	 */
-	static class BinarySearch<T> {
+	static class BinarySearch<T extends Comparable<T>> {
 		private List<T> sortedList;
 
 		public int indexOf(T t) {
-			// TODO Write an implementation for this method declaration
-			return 0;
+			if (t == null)
+				return -1;
+
+			int left = 0;
+			int right = sortedList.size();
+
+			while (right - left > 1) {
+				final int middleIndex = (left + right) / 2;
+				final T middleItem = sortedList.get(middleIndex);
+				if (middleItem.equals(t))
+					return middleIndex;
+
+				// else
+				if (t.compareTo(middleItem) < 0) {
+					// search left
+					right = middleIndex;
+				} else {
+					// search right
+					left = middleIndex + 1;
+				}
+			}
+
+			if (left < sortedList.size())
+				return sortedList.get(left).equals(t) ? left : -1;
+			// else it's out of bounds, it wasn't found
+			return -1;
 		}
 
 		public BinarySearch(List<T> sortedList) {
@@ -263,8 +360,16 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isArmstrongNumber(int input) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		final int numDigits = (input + "").length();
+		int sum = 0;
+		int copy = input;
+		while (copy > 0) {
+			final int digit = copy % 10;
+			sum += (int) Math.pow(digit, numDigits);
+			copy /= 10;
+		}
+
+		return sum == input;
 	}
 
 	/**
@@ -278,8 +383,35 @@ public class EvaluationService {
 	 * @return
 	 */
 	public List<Long> calculatePrimeFactorsOf(long l) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		final List<Long> list = new ArrayList<Long>();
+		long stop = (long) Math.sqrt(l);
+
+		for (long test = 2; test <= stop; ++test) {
+			if (l % test == 0) {
+				// add this factor to list
+				list.add(test);
+
+				// divide out ALL of these prime factors so that the next number that l is
+				// divisible by is guaranteed to be prime (and not some multiple of this prime)
+				l /= test;
+				while (l % test == 0) {
+					l /= test;
+//					list.add(test);
+				}
+
+				// update stop because you don't need to go to the original square root anymore,
+				// you're now trying to factor a new number that you know doesn't contain any
+				// prime factors below test
+				stop = (long) Math.sqrt(l);
+			}
+		}
+
+		if (l > 1) {
+			// what's remaining is a prime number
+			list.add(l);
+		}
+
+		return list;
 	}
 
 	/**
@@ -313,12 +445,26 @@ public class EvaluationService {
 
 		public RotationalCipher(int key) {
 			super();
-			this.key = key;
+			this.key = key % 26;
 		}
 
 		public String rotate(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			final char[] rotated = new char[string.length()];
+
+			for (int i = 0; i < rotated.length; ++i) {
+				final char c = string.charAt(i);
+
+				if (Character.isAlphabetic(c)) {
+					if (Character.isUpperCase(c)) {
+						rotated[i] = (char) ('A' + ((c - 'A' + key) % 26));
+					} else {
+						rotated[i] = (char) ('a' + ((c - 'a' + key) % 26));
+					}
+				} else
+					rotated[i] = c;
+			}
+
+			return new String(rotated);
 		}
 
 	}
@@ -336,8 +482,37 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int calculateNthPrime(int i) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		final List<Integer> primes = new ArrayList<Integer>(i);
+
+		for (int count = 0; count < i; ++count)
+			primes.add(nextPrime(primes));
+
+		return primes.get(i - 1);
+	}
+
+	private static final int nextPrime(final List<Integer> primes) {
+		// I can easily skip ahead two knowing that all primes greater than 2
+		// are odd (i.e. not divisible by 2)
+		if (primes.size() == 0)
+			return 2;
+		if (primes.size() == 1)
+			return 3;
+
+		// else proceed by skippin evens (should double the speed if we didn't do that)
+		int nextPrime = primes.get(primes.size() - 1) + 2;
+
+		while (true) {
+			final int stop = (int) Math.sqrt(nextPrime);
+
+			for (final int prime : primes) {
+				if (prime > stop)
+					return nextPrime;
+				if (nextPrime % prime == 0)
+					break;
+			}
+
+			nextPrime += 2;
+		}
 	}
 
 	/**
@@ -373,8 +548,12 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String encode(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			final char[] encoded = new char[string.length()];
+
+			for (int i = 0; i < encoded.length; ++i)
+				encoded[i] = switchChar(string.charAt(i));
+
+			return new String(encoded);
 		}
 
 		/**
@@ -384,8 +563,19 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String decode(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			return encode(string);
+		}
+
+		public static char switchChar(final char c) {
+			if (Character.isAlphabetic(c)) {
+				if (Character.isUpperCase(c)) {
+					return (char) ('Z' - (c - 'A'));
+				} else {
+					return (char) ('z' - (c - 'a'));
+				}
+			}
+			// else don't encode
+			return c;
 		}
 	}
 
@@ -430,8 +620,18 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isPangram(String string) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		string = string.toLowerCase();
+		final Set<Character> charSet = new HashSet<Character>(26);
+
+		final int len = string.length();
+
+		for (int i = 0; i < len; ++i) {
+			final char c = string.charAt(i);
+			if (Character.isAlphabetic(c))
+				charSet.add(c);
+		}
+
+		return charSet.size() == 26;
 	}
 
 	/**
@@ -461,8 +661,19 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getSumOfMultiples(int i, int[] set) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		final boolean[] sieve = new boolean[i];
+		int sum = 0;
+
+		for (final int multiple : set) {
+			for (int num = multiple; num < i; num += multiple) {
+				if (!sieve[num]) {
+					sieve[num] = true;
+					sum += num;
+				}
+			}
+		}
+
+		return sum;
 	}
 
 	/**
