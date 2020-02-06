@@ -203,14 +203,28 @@ public class EvaluationService {
 		final char[] clean = new char[10];
 		int index = 9;
 
-		for (int i = string.length() - 1; index >= 0 && i >= 0; --i) {
+		for (int i = string.length() - 1; i >= 0; --i) {
 			final char c = string.charAt(i);
 
-			if (Character.isDigit(c))
-				clean[index--] = c;
+			if (Character.isDigit(c)) {
+				// it's OK if index is -1 AND c is 1, but if index goes any smaller or this
+				// digit isn't 1, then this is wrong
+				if (index < -1)
+					throw new IllegalArgumentException("Invalid phone number, too many digits");
+				if (index == -1) {
+					if (c != '1')
+						throw new IllegalArgumentException("Invalid country code, must be 1");
+					// else it's fine, just skip it
+				} else // else keep adding to clean phone number
+					clean[index--] = c;
+			}
 		}
 
 		return new String(clean);
+	}
+
+	public static boolean isValidPhoneDelimiter(final char c) {
+		return c == ' ' || c == '.' || c == '-' || c == '(' || c == ')' || c == '+';
 	}
 
 	/**
