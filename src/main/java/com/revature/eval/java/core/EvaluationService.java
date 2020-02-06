@@ -240,40 +240,15 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
+		final String[] words = string.split("[^\\p{Alpha}]+");
 		final Map<String, Integer> wordCount = new HashMap<String, Integer>();
-		StringBuilder word = new StringBuilder();
 
-		final int len = string.length();
-
-		for (int i = 0; i < len; ++i) {
-			final char c = string.charAt(i);
-
-			if (Character.isAlphabetic(c)) {
-				word.append(c);
-			} else if (word.length() > 0) {
-
-				final String wordStr = word.toString();
-				final Integer count = wordCount.get(wordStr);
-
-				if (count == null)
-					wordCount.put(wordStr, 1);
-				else
-					wordCount.put(wordStr, count + 1);
-
-				// clear stringbuilder
-				word.delete(0, word.length());
-			}
-		}
-
-		if (word.length() > 0) {
-			// process last word
-			final String wordStr = word.toString();
-			final Integer count = wordCount.get(wordStr);
-
+		for (final String word : words) {
+			final Integer count = wordCount.get(word);
 			if (count == null)
-				wordCount.put(wordStr, 1);
+				wordCount.put(word, 1);
 			else
-				wordCount.put(wordStr, count + 1);
+				wordCount.put(word, count + 1);
 		}
 
 		return wordCount;
