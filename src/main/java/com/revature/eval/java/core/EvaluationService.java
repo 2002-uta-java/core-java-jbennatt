@@ -154,6 +154,8 @@ public class EvaluationService {
 		// iterate through each character in string
 		for (int i = 0; i < len; ++i) {
 			final char c = upper.charAt(i);
+
+			// check to make sure this is a valid word
 			if (Character.isAlphabetic(c))
 				score += getScrabbleScore(c);
 			else
@@ -268,15 +270,18 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
+		// split string on non-alpha characters, this gives me an array of words
 		final String[] words = string.split("[^\\p{Alpha}]+");
 		final Map<String, Integer> wordCount = new HashMap<String, Integer>();
 
 		for (final String word : words) {
-			final Integer count = wordCount.get(word);
-			if (count == null)
+			// if the wordCount map doesn't contain word, then this is the first
+			// encounter--add it and its count to 1--otherwise just add one to the previous
+			// count.
+			if (!wordCount.containsKey(word))
 				wordCount.put(word, 1);
 			else
-				wordCount.put(word, count + 1);
+				wordCount.put(word, wordCount.get(word) + 1);
 		}
 
 		return wordCount;
