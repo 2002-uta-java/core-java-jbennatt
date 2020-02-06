@@ -429,12 +429,15 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String toPigLatin(String string) {
-		final String words[] = string.split("\\s");
+		// split on non-alpha characters
+		final String words[] = string.split("[^\\p{Alpha}]+");
 
 		final StringBuilder pigLatin = new StringBuilder(string.length());
 
+		// handle fence post, now every subsequent word will have a space before it
 		pigLatin.append(convertWordToPigLatin(words[0]));
 
+		// just convert each word to pig latin individually
 		for (int i = 1; i < words.length; ++i)
 			pigLatin.append(" " + convertWordToPigLatin(words[i]));
 
@@ -502,12 +505,24 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isArmstrongNumber(int input) {
-		final int numDigits = (input + "").length();
+		// get the number of digits by taking the log base 10. Think about it:
+		// log_{10}(100) = 2 but it's 3 digits, so need to add 1. 500 is 2.??? so I
+		// still need to add one and then the cast to an int will round it down.
+		final int numDigits = (int) (Math.log10(input) + 1);
 		int sum = 0;
+
+		// need to keep the original input to test at the end
 		int copy = input;
+
+		// keep dividing by 10 until copy is 0
 		while (copy > 0) {
+			// get current one's digit (modulo 10)
 			final int digit = copy % 10;
+
+			// add power of that digit
 			sum += (int) Math.pow(digit, numDigits);
+
+			// reduce by dividing by 10
 			copy /= 10;
 		}
 
@@ -539,6 +554,7 @@ public class EvaluationService {
 				while (l % test == 0) {
 					l /= test;
 					list.add(test);
+					// keep adding prime each time to get full prime factorization
 				}
 
 				// update stop because you don't need to go to the original square root anymore,
