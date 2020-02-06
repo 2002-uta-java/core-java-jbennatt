@@ -774,6 +774,8 @@ public class EvaluationService {
 		return charSet.size() == 26;
 	}
 
+	private final TemporalAmount gigasecond = Duration.ofSeconds(1000000000l);
+
 	/**
 	 * 17. Calculate the moment when someone has lived for 10^9 seconds.
 	 * 
@@ -783,34 +785,24 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Temporal getGigasecondDate(Temporal given) {
-		final TemporalAmount gigasecond = Duration.ofSeconds(1000000000l);
 
-		try {
+		if (given instanceof LocalDate) {
+			// convert to second precision of LocalDateTime (assume we're starting from the
+			// start of the day)
+			// this is sort of the "base" case (this should return a value because this is a
+			// LocalDateTime).
+			return getGigasecondDate(((LocalDate) given).atStartOfDay());
+		} else if (given instanceof Year) {
+			// convert to a LocalDate (day 1 of the year)
+			return getGigasecondDate(((Year) given).atDay(1));
+
+			// this will throw an exception, then be handled by the above case
+		} else if (given instanceof YearMonth) {
+			// similar to above, this will return a LocalDate which will then be handled by
+			// this first case.
+			return getGigasecondDate(((YearMonth) given).atDay(1));
+		} else {
 			return given.plus(gigasecond);
-		} catch (UnsupportedTemporalTypeException utte) {
-			// so basically we're going to try and get the Temporal objects
-			// without second-time precision to a representation that does
-			// namely, LocalDateTime
-
-			if (given instanceof LocalDate) {
-				// convert to second precision of LocalDateTime (assume we're starting from the
-				// start of the day)
-				// this is sort of the "base" case (this should return a value because this is a
-				// LocalDateTime).
-				return getGigasecondDate(((LocalDate) given).atStartOfDay());
-			} else if (given instanceof Year) {
-				// convert to a LocalDate (day 1 of the year)
-				return getGigasecondDate(((Year) given).atDay(1));
-
-				// this will throw an exception, then be handled by the above case
-			} else if (given instanceof YearMonth) {
-				// similar to above, this will return a LocalDate which will then be handled by
-				// this first case.
-				return getGigasecondDate(((YearMonth) given).atDay(1));
-			}
-
-			// if none of these handle the exception, I give up
-			throw utte;
 		}
 	}
 
