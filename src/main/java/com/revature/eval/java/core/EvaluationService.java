@@ -398,8 +398,61 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String toPigLatin(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		final String words[] = string.split("\\s");
+
+		final StringBuilder pigLatin = new StringBuilder(string.length());
+
+		pigLatin.append(convertWordToPigLatin(words[0]));
+
+		for (int i = 1; i < words.length; ++i)
+			pigLatin.append(" " + convertWordToPigLatin(words[i]));
+
+		return pigLatin.toString();
+	}
+
+	// list is from https://www.enchantedlearning.com/consonantblends/
+	// added "qu" (sorted from longest to shortest)
+	public static final String[] BLENDS_DIGRAPHS_TRIGRAPHS_OH_MY = { "sch", "scr", "shr", "sph", "spl", "spr", "squ",
+			"str", "thr", "bl", "br", "ch", "cl", "cr", "dr", "fl", "fr", "gl", "gr", "pl", "pr", "sc", "sh", "sk",
+			"sl", "sm", "sn", "sp", "st", "sw", "th", "tr", "tw", "wh", "wr", "qu" };
+
+	public static final String convertWordToPigLatin(String word) {
+		// check to see if first letter is a vowel
+		if (isVowel(word.charAt(0))) {
+			return word + "ay";
+		}
+		// else see if it's a blend
+		for (final String blend : BLENDS_DIGRAPHS_TRIGRAPHS_OH_MY) {
+			if (word.indexOf(blend) == 0) {
+				// remove blend from beginning of word
+				word = word.replace(blend, "");
+				// add to the end
+				return word + blend + "ay";
+			}
+		}
+
+		// nope, just a single consonant, remove it and add to the end
+		final char first = word.charAt(0);
+
+		return word.substring(1) + first + "ay";
+	}
+
+	public static boolean isVowel(final char c) {
+		switch (c) {
+		case 'a':
+		case 'A':
+		case 'e':
+		case 'E':
+		case 'i':
+		case 'I':
+		case 'o':
+		case 'O':
+		case 'u':
+		case 'U':
+			return true;
+		default: // then it's a consonant (or a y...)
+			return false;
+		}
 	}
 
 	/**
