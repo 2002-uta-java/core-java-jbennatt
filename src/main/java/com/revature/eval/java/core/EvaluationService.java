@@ -370,13 +370,13 @@ public class EvaluationService {
 				}
 			}
 
+			// there are two elements left in range, the "left" and "right"--check them
 			if (right - left == 2) {
-				// need to check left and right
 				final int index = indexOfLeftRight(t, left, right - 1);
 				if (index >= 0)
 					return index;
 			} else if (right - left == 1) {
-				// just need to check left
+				// there was only one left, the "left", so just check it
 				if (sortedList.get(left).equals(t))
 					return left;
 			}
@@ -384,6 +384,7 @@ public class EvaluationService {
 			return -1;
 		}
 
+		// helper method to test left and right side of range.
 		private int indexOfLeftRight(T t, final int left, final int right) {
 			// test to see if any three of the indexes are the element we're searching for.
 			// If so, return that index.
