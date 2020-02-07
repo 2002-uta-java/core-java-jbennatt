@@ -975,9 +975,10 @@ public class EvaluationService {
 	 */
 	public boolean isLuhnValid(String string) {
 		// remove all white space
-		string = string.replaceAll("\\s", "");
+		string = string.replaceAll("\\s+", "");
 		// strip out all non-digits (this shouldn't do anything for a valid Luhn Number
-		// String
+		// String. I can't just do this from the beginning because I need to know
+		// whether or not there are invalid characters (i.e. non-digits) in the string
 		final String digits = string.replaceAll("[^\\d]+", "");
 
 		// save length of digits for later
@@ -989,50 +990,54 @@ public class EvaluationService {
 			return false;
 		// else validate Luhn Number String
 
-		// needs to be more than one digit (if there is only one digit but also invalid
-		// characters it will fail below)
-		if (string.length() <= 1)
-			return false;
-
 		// handle fence post (get first--really last--digit) then below every subsequent
 		// digit is guaranteed to have a "previous" (which is really the next digit).
 		int sum = doubleLuhnNumber(digits.charAt(len - 1));
-		// TODO need to finish this part
-
-		for (int i = 0; i < len; ++i) {
-			sum += doubleLuhnNumber(digits.charAt(i));
-		}
-
-		final int len = string.length();
-
-		int sum = 0;
-
-		char c = string.charAt(len - 1);
-
-		// handle fence post (get first--really last--digit) then below every subsequent
-		// digit is guaranteed to have a "previous" (which is really the next digit).
-		if (Character.isDigit(c))
-			sum += doubleLuhnNumber(c);
-		else
-			return false; // found an invalid character
+		
 
 		for (int i = len - 3; i >= 0; i -= 2) {
-			// check the previous character
-			final char cPrev = string.charAt(i + 1);
-			if (Character.isDigit(cPrev))
-				sum += c - '0';
-			else
-				return false;
-
-			c = string.charAt(i);
-
-			if (Character.isDigit(c))
-				sum += doubleLuhnNumber(c);
-			else
-				return false;
+			sum += doubleLuhnNumber(digits.charAt(i));
+			sum += digits.charAt(i + 1) - '0';
 		}
 
 		return sum % 10 == 0;
+		// TODO This isnt working
+
+		// needs to be more than one digit (if there is only one digit but also invalid
+		// characters it will fail below)
+//		if (string.length() <= 1)
+//			return false;
+
+//		final int len = string.length();
+//
+//		int sum = 0;
+//
+//		char c = string.charAt(len - 1);
+//
+//		// handle fence post (get first--really last--digit) then below every subsequent
+//		// digit is guaranteed to have a "previous" (which is really the next digit).
+//		if (Character.isDigit(c))
+//			sum += doubleLuhnNumber(c);
+//		else
+//			return false; // found an invalid character
+//
+//		for (int i = len - 3; i >= 0; i -= 2) {
+//			// check the previous character
+//			final char cPrev = string.charAt(i + 1);
+//			if (Character.isDigit(cPrev))
+//				sum += c - '0';
+//			else
+//				return false;
+//
+//			c = string.charAt(i);
+//
+//			if (Character.isDigit(c))
+//				sum += doubleLuhnNumber(c);
+//			else
+//				return false;
+//		}
+//
+//		return sum % 10 == 0;
 	}
 
 	// this assumes c is a valid digit
