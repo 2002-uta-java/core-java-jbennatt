@@ -916,11 +916,17 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getSumOfMultiples(int i, int[] set) {
+		// use a sieve so that you just go through each number's multiples once
 		final boolean[] sieve = new boolean[i];
-		int sum = 0;
+		int sum = 0;// keep running sum
 
+		// go through each multiple in the set
 		for (final int multiple : set) {
+			// fill in sieve for each multiple
 			for (int num = multiple; num < i; num += multiple) {
+				// if this number isn't present, add it to the sieve (set that entry to true)
+				// and add it to the sum (next time this number is seen, it's sieve entry will
+				// be true and it won't be re-added to the sum)
 				if (!sieve[num]) {
 					sieve[num] = true;
 					sum += num;
