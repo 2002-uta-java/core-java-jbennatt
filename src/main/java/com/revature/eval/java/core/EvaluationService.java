@@ -809,6 +809,22 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isValidIsbn(String string) {
+		// remove all non-digits
+		string = string.replaceAll("[^\\d]+", "");
+		
+		if(string.length() != 10)
+			return false;
+		// else iterate through digits 
+		int sum = 0;
+		
+		// compute sum for first 9 digits
+		for(int i = 0; i < 9; ++i) {
+			sum += (10 - i) * (string.charAt(i) - '0');
+		}
+		
+		final char last = string.charAt(9);
+		// TODO need to handle X
+
 		int sum = 0;
 		int count = 0;
 		final int len = string.length();
