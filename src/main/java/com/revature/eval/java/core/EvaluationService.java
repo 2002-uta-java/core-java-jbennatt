@@ -228,36 +228,46 @@ public class EvaluationService {
 	 * NANP-countries, only 1 is considered a valid country code.
 	 */
 	public String cleanPhoneNumber(String string) {
-		// a valid clean number will have exactly 10 digits
-		final char[] clean = new char[10];
+		// remove all non-digits from string
+		string = string.replaceAll("[^\\d]+", "");
 
-		// going to run this backwards, so "first" index will be the last
-		int index = 9;
+		if (string.length() == 10)
+			return string;
+		else if (string.length() == 11 && string.charAt(0) == '1')
+			return string.substring(1);
+		else
+			throw new IllegalArgumentException("invalid phone number: " + string);
 
-		// go backwards through string
-		for (int i = string.length() - 1; i >= 0; i--) {
-			final char c = string.charAt(i);
-
-			if (Character.isDigit(c)) {
-				// if index has become negative, there are too many digits in this number
-				if (index < 0) {
-					if (c != '1' || index < -1)
-						throw new IllegalArgumentException("Invalid Phone Number (too many digits): " + string);
-					// UNLESS that extra digit is 1 AND index == -1
-				}
-				// add this digit to the clean number
-				clean[index--] = c;
-			}
-			// else just skip non-digits (don't worry about any strange formatting. Just
-			// looking for 10 digits (or 11 with a leading 1)
-		}
-
-		// if index is anything but -1 (meaning index = 0 was the last index set), then
-		// there weren't enough digits
-		if (index != -1)
-			throw new IllegalArgumentException("Invalid Phone Number (not enough numbers): " + string);
-
-		return new String(clean);
+//		// a valid clean number will have exactly 10 digits
+//		final char[] clean = new char[10];
+//
+//		// going to run this backwards, so "first" index will be the last
+//		int index = 9;
+//
+//		// go backwards through string
+//		for (int i = string.length() - 1; i >= 0; i--) {
+//			final char c = string.charAt(i);
+//
+//			if (Character.isDigit(c)) {
+//				// if index has become negative, there are too many digits in this number
+//				if (index < 0) {
+//					if (c != '1' || index < -1)
+//						throw new IllegalArgumentException("Invalid Phone Number (too many digits): " + string);
+//					// UNLESS that extra digit is 1 AND index == -1
+//				}
+//				// add this digit to the clean number
+//				clean[index--] = c;
+//			}
+//			// else just skip non-digits (don't worry about any strange formatting. Just
+//			// looking for 10 digits (or 11 with a leading 1)
+//		}
+//
+//		// if index is anything but -1 (meaning index = 0 was the last index set), then
+//		// there weren't enough digits
+//		if (index != -1)
+//			throw new IllegalArgumentException("Invalid Phone Number (not enough numbers): " + string);
+//
+//		return new String(clean);
 	}
 
 	/**
