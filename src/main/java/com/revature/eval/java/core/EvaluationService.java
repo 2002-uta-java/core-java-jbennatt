@@ -607,19 +607,25 @@ public class EvaluationService {
 		}
 
 		public String rotate(String string) {
+			// rotated string will be same length as original
 			final char[] rotated = new char[string.length()];
 
+			// iterate through strings
 			for (int i = 0; i < rotated.length; ++i) {
 				final char c = string.charAt(i);
 
+				// if it's alphabetic, rotate it, else don't do anything
 				if (Character.isAlphabetic(c)) {
+					// handle upper and lower case letters separately
+					// just add the amount and then modulo 26 in case it overflows
 					if (Character.isUpperCase(c)) {
 						rotated[i] = (char) ('A' + ((c - 'A' + key) % 26));
 					} else {
 						rotated[i] = (char) ('a' + ((c - 'a' + key) % 26));
 					}
-				} else
+				} else {
 					rotated[i] = c;
+				}
 			}
 
 			return new String(rotated);
