@@ -633,6 +633,7 @@ public class EvaluationService {
 
 	}
 
+	// keep list of primes rather than generating them on every call
 	private List<Integer> primes = new ArrayList<Integer>();
 
 	/**
@@ -648,43 +649,58 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int calculateNthPrime(int i) {
+		// catch illegal arguments
 		if (i <= 0)
 			throw new IllegalArgumentException("The nth prime must be a natural number, not " + i);
 
-//		final List<Integer> primes = new ArrayList<Integer>(i);
-
+		// if we already have the prime, just return it from the list of primes
 		if (i <= primes.size())
 			return primes.get(i - 1);
 
+		// start with the end of the primes list and generate up to i
 		for (int count = primes.size(); count < i; ++count)
 			primes.add(nextPrime(primes));
 
+		// primes is 0-indexed
 		return primes.get(i - 1);
 	}
 
 	private static final int nextPrime(final List<Integer> primes) {
 		// I can easily skip ahead two knowing that all primes greater than 2
 		// are odd (i.e. not divisible by 2)
-		if (primes.size() == 0)
+
+		if (primes.size() == 0)// if primes is empty, the next prime is 2
 			return 2;
-		if (primes.size() == 1)
+		if (primes.size() == 1) // if there's one prime (2), the next is 3
 			return 3;
 
-		// else proceed by skippin evens (should double the speed if we didn't do that)
+		// else proceed by skipping evens (should double the speed if we didn't do that)
 		int nextPrime = primes.get(primes.size() - 1) + 2;
 
+		// keep going until we find the next prime
 		while (true) {
 			final int stop = (int) Math.sqrt(nextPrime);
 
+			// since I have a list of primes, I can just test those (rather than having to
+			// try non-prime factors.
 			for (final int prime : primes) {
+				// this means we checked all primes up to the sqrt of nextPrime, meaning that
+				// nextPrime is indeed prime
 				if (prime > stop)
 					return nextPrime;
+
+				// stop this for loop if we found a factor of nextPrime, proceed to checking the
+				// next candidate
 				if (nextPrime % prime == 0)
 					break;
 			}
 
+			// skip by 2's (so we're not checking evens...even though they'd fail the modulo
+			// immediately)
 			nextPrime += 2;
 		}
+		// nothing to return here because the only way out of the above while loop is to
+		// return a value
 	}
 
 	/**
