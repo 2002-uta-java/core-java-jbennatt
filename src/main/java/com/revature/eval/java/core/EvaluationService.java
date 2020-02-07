@@ -810,61 +810,30 @@ public class EvaluationService {
 	 */
 	public boolean isValidIsbn(String string) {
 		// remove all non-digits
-		string = string.replaceAll("[^\\d]+", "");
-		
-		if(string.length() != 10)
+		string = string.replaceAll("[^\\dxX]+", "");
+
+		if (string.length() != 10)
 			return false;
-		// else iterate through digits 
+		// else iterate through digits
 		int sum = 0;
-		
+
 		// compute sum for first 9 digits
-		for(int i = 0; i < 9; ++i) {
-			sum += (10 - i) * (string.charAt(i) - '0');
+		for (int i = 0; i < 9; ++i) {
+			// make sure there are no x's in the first 9 digits
+			final char digit = string.charAt(i);
+			if (!Character.isDigit(digit))
+				return false;
+			sum += (10 - i) * (digit - '0');
 		}
-		
+
+		// the last digit could be x
 		final char last = string.charAt(9);
-		// TODO need to handle X
-
-		int sum = 0;
-		int count = 0;
-		final int len = string.length();
-
-		// check that first character is a digit
-		if (!Character.isDigit(string.charAt(0)))
-			return false;
-
-		for (int i = 0; i < len; ++i) {
-			final char c = string.charAt(i);
-			if (Character.isDigit(c)) {
-				// add to the sum
-				sum += (10 - count++) * (c - '0');
-			} else if (c == 'X' || c == 'x') {
-				// 'x' can only come at the end of the string
-				// count must currently be 9 (so that the next is 10)
-				// AND we must be at the end of the string
-				if (count != 9 || i != len - 1)
-					return false;
-				// I know count must now be 10, which means I just add (1 * 10)
-				sum += 10;
-				count = 10; // just set count to 10
-			} else if (c != '-') // anything other than dashes are not permitted
-				return false;
-
-			// if count gets above 10, we have a mistake
-			if (count > 10)
-				return false;
-			// check count, if it's 10, then we should be at the end of the list. If it is
-			// and we're not, this isn't valid.
-			if (count == 10 && i != len - 1)
-				return false;
+		if (last == 'x' || last == 'X') {
+			sum += 10; // add 10 if x
+		} else { // just add the digit
+			sum += last - '0';
 		}
-
-		// if we get through the above loop, then we've 1) never seen an invalid
-		// character and 2) count is <= 10. If it IS < 10, this isn't valid.
-		if (count == 10)
-			return sum % 11 == 0;
-		// else this failed
-		return false;
+		return sum % 11 == 0;
 	}
 
 	/**
