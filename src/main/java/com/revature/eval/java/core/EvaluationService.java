@@ -736,9 +736,10 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String encode(String string) {
+			// returned encoded won't be the same size as string so use a StringBuilder
 			final StringBuilder encoded = new StringBuilder();
-			final int len = string.length();
-			int letterCount = 0;
+			final int len = string.length(); // don't keep calling string.length()
+			int letterCount = 0; // used to ensure blocks of length 5
 
 			for (int i = 0; i < len; ++i) {
 				final char encodedC = switchChar(string.charAt(i));
@@ -789,10 +790,6 @@ public class EvaluationService {
 			return 0;
 		}
 	}
-
-//	public static boolean isLetter(final char c) {
-//		return (c <= 'z' && c >= 'a') || (c <= 'Z' && c >= 'A');
-//	}
 
 	/**
 	 * 15. The ISBN-10 verification process is used to validate book identification
