@@ -850,17 +850,22 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isPangram(String string) {
+		// make it easier by just handling lower case letters
 		string = string.toLowerCase();
+
+		// use a set so that no duplicates are allowed
 		final Set<Character> charSet = new HashSet<Character>(26);
 
-		final int len = string.length();
+		final int len = string.length();// don't keep calling length()
 
 		for (int i = 0; i < len; ++i) {
+			// if it's alphabetic, add it to the set, otherwise don't
 			final char c = string.charAt(i);
 			if (Character.isAlphabetic(c))
 				charSet.add(c);
 		}
 
+		// if it has all of the letters, the set's size will be 26
 		return charSet.size() == 26;
 	}
 
