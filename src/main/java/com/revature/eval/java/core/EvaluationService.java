@@ -231,43 +231,17 @@ public class EvaluationService {
 		// remove all non-digits from string
 		string = string.replaceAll("[^\\d]+", "");
 
-		if (string.length() == 10)
+		// if it's now 10 digits, that's the phone number
+		if (string.length() == 10) {
 			return string;
-		else if (string.length() == 11 && string.charAt(0) == '1')
+		} else if (string.length() == 11 && string.charAt(0) == '1') {
+			// it CAN be of length 11 but the first character must be a 1
 			return string.substring(1);
-		else
+		} else {
+			// if it's not 10 or 11 digits, it's invalid. It's also invalid if it's 11
+			// digits with a prefix not 1.
 			throw new IllegalArgumentException("invalid phone number: " + string);
-
-//		// a valid clean number will have exactly 10 digits
-//		final char[] clean = new char[10];
-//
-//		// going to run this backwards, so "first" index will be the last
-//		int index = 9;
-//
-//		// go backwards through string
-//		for (int i = string.length() - 1; i >= 0; i--) {
-//			final char c = string.charAt(i);
-//
-//			if (Character.isDigit(c)) {
-//				// if index has become negative, there are too many digits in this number
-//				if (index < 0) {
-//					if (c != '1' || index < -1)
-//						throw new IllegalArgumentException("Invalid Phone Number (too many digits): " + string);
-//					// UNLESS that extra digit is 1 AND index == -1
-//				}
-//				// add this digit to the clean number
-//				clean[index--] = c;
-//			}
-//			// else just skip non-digits (don't worry about any strange formatting. Just
-//			// looking for 10 digits (or 11 with a leading 1)
-//		}
-//
-//		// if index is anything but -1 (meaning index = 0 was the last index set), then
-//		// there weren't enough digits
-//		if (index != -1)
-//			throw new IllegalArgumentException("Invalid Phone Number (not enough numbers): " + string);
-//
-//		return new String(clean);
+		}
 	}
 
 	/**
