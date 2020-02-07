@@ -888,15 +888,16 @@ public class EvaluationService {
 			// LocalDateTime).
 			return getGigasecondDate(((LocalDate) given).atStartOfDay());
 		} else if (given instanceof Year) {
-			// convert to a LocalDate (day 1 of the year)
+			// convert to a LocalDate (day 1 of the year) (which will then be handled by the
+			// above case
 			return getGigasecondDate(((Year) given).atDay(1));
-
-			// this will throw an exception, then be handled by the above case
 		} else if (given instanceof YearMonth) {
 			// similar to above, this will return a LocalDate which will then be handled by
 			// this first case.
 			return getGigasecondDate(((YearMonth) given).atDay(1));
 		} else {
+			// if we encounter something that's not one of the above and isn't compatible
+			// with seconds, this will throw an exception.
 			return given.plus(gigasecond);
 		}
 	}
