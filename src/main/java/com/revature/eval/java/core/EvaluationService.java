@@ -976,11 +976,32 @@ public class EvaluationService {
 	public boolean isLuhnValid(String string) {
 		// remove all white space
 		string = string.replaceAll("\\s", "");
+		// strip out all non-digits (this shouldn't do anything for a valid Luhn Number
+		// String
+		final String digits = string.replaceAll("[^\\d]+", "");
+
+		// save length of digits for later
+		final int len = digits.length();
+
+		// if the replaceAll above actually removed anything, it's not a valid Luhn
+		// Number String. It's also invalid if it's only of length 1.
+		if (len != string.length() || len <= 1)
+			return false;
+		// else validate Luhn Number String
 
 		// needs to be more than one digit (if there is only one digit but also invalid
 		// characters it will fail below)
 		if (string.length() <= 1)
 			return false;
+
+		// handle fence post (get first--really last--digit) then below every subsequent
+		// digit is guaranteed to have a "previous" (which is really the next digit).
+		int sum = doubleLuhnNumber(digits.charAt(len - 1));
+		// TODO need to finish this part
+
+		for (int i = 0; i < len; ++i) {
+			sum += doubleLuhnNumber(digits.charAt(i));
+		}
 
 		final int len = string.length();
 
