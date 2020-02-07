@@ -742,11 +742,13 @@ public class EvaluationService {
 			int letterCount = 0; // used to ensure blocks of length 5
 
 			for (int i = 0; i < len; ++i) {
+				// encode the character
 				final char encodedC = switchChar(string.charAt(i));
 
-				if (encodedC != 0) {
+				if (encodedC != 0) {// don't encode non-characters
 					// don't add a space until the next alpha character is found
 					if (letterCount == 5) {
+						// we've written five characters, add space and reset counter
 						letterCount = 0;
 						encoded.append(' ');
 					}
@@ -765,29 +767,38 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String decode(String string) {
-			final StringBuilder encoded = new StringBuilder();
-			final int len = string.length();
+			// encoded string has extra spaces, so the decoded won't be the same length
+			final StringBuilder decoded = new StringBuilder();
+			final int len = string.length(); // don't keep calling length()
 
 			for (int i = 0; i < len; ++i) {
+				// encoding and decoding mean just switching back and forth
 				final char encodedC = switchChar(string.charAt(i));
+
+				// write character to decoded if it's an alpha character
 				if (encodedC != 0) {
-					encoded.append(encodedC);
+					decoded.append(encodedC);
 				}
 			}
 
-			return encoded.toString();
+			return decoded.toString();
 		}
 
+		// helper method for atbash cipher. Switches the character, changes it to lower
+		// case, and returns 0 if the character is a non-alphanumeric characters (which
+		// are ignored in the atbash cipher above)
 		public static char switchChar(final char c) {
 			if (Character.isAlphabetic(c)) {
+				// we're going to make it lower case, but we need to subtract from a differ 'A'
+				// depending on upper or lower case
 				if (Character.isUpperCase(c)) {
 					return (char) ('z' - (c - 'A'));
 				} else {
 					return (char) ('z' - (c - 'a'));
 				}
-			} else if (Character.isDigit(c))
+			} else if (Character.isDigit(c))// return numerals unchanged
 				return c;
-			return 0;
+			return 0;// return 0 for non-alphanumeric characters
 		}
 	}
 
