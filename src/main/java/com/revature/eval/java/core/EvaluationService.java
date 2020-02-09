@@ -993,7 +993,6 @@ public class EvaluationService {
 		// handle fence post (get first--really last--digit) then below every subsequent
 		// digit is guaranteed to have a "previous" (which is really the next digit).
 		int sum = doubleLuhnNumber(digits.charAt(len - 1));
-		
 
 		for (int i = len - 3; i >= 0; i -= 2) {
 			sum += doubleLuhnNumber(digits.charAt(i));
