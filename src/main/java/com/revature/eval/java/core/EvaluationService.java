@@ -531,6 +531,9 @@ public class EvaluationService {
 	 * @return
 	 */
 	public List<Long> calculatePrimeFactorsOf(long l) {
+		if (l <= 1)
+			throw new IllegalArgumentException("Cannot factor numbers <= 1: " + l);
+
 		final List<Long> list = new ArrayList<Long>();
 		long stop = (long) Math.sqrt(l);
 
@@ -642,7 +645,7 @@ public class EvaluationService {
 	public int calculateNthPrime(int i) {
 		// catch illegal arguments
 		if (i <= 0)
-			throw new IllegalArgumentException("The nth prime must be a natural number, not " + i);
+			throw new IllegalArgumentException("The nth prime must be a cardinal number, not " + i);
 
 		// if we already have the prime, just return it from the list of primes
 		if (i <= primes.size())
