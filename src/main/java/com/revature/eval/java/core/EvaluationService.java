@@ -653,13 +653,13 @@ public class EvaluationService {
 
 		// start with the end of the primes list and generate up to i
 		for (int count = primes.size(); count < i; ++count)
-			primes.add(nextPrime(primes));
+			primes.add(nextPrime());
 
 		// primes is 0-indexed
 		return primes.get(i - 1);
 	}
 
-	private static final int nextPrime(final List<Integer> primes) {
+	private int nextPrime() {
 		// I can easily skip ahead two knowing that all primes greater than 2
 		// are odd (i.e. not divisible by 2)
 
