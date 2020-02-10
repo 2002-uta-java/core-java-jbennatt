@@ -783,8 +783,8 @@ public class EvaluationService {
 		// are ignored in the atbash cipher above)
 		public static char switchChar(final char c) {
 			if (Character.isAlphabetic(c)) {
-				// we're going to make it lower case, but we need to subtract from a differ 'A'
-				// depending on upper or lower case
+				// we're going to make it lower case, but we need to subtract from a different
+				// 'A' depending on upper or lower case
 				if (Character.isUpperCase(c)) {
 					return (char) ('z' - (c - 'A'));
 				} else {
@@ -819,30 +819,37 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isValidIsbn(String string) {
-		// remove all non-digits
+		// remove all non-digits/x's (upper or lower case 'x')
 		string = string.replaceAll("[^\\dxX]+", "");
 
-		if (string.length() != 10)
+		// must be exactly of length 10 AND the first 9 must be all digits, followed by
+		// either a digit or 'x' (upper or lower case)
+		if (string.length() != 10 || !string.matches("\\d{9}[\\dxX]"))
 			return false;
 		// else iterate through digits
+
 		int sum = 0;
 
-		// compute sum for first 9 digits
+		// compute sum for first 9 digits (the regex above already ensures the first 9
+		// characters are all digits)
 		for (int i = 0; i < 9; ++i) {
-			// make sure there are no x's in the first 9 digits
-			final char digit = string.charAt(i);
-			if (!Character.isDigit(digit))
-				return false;
-			sum += (10 - i) * (digit - '0');
+			sum += (10 - i) * (string.charAt(i) - '0');
 		}
 
 		// the last digit could be x
 		final char last = string.charAt(9);
-		if (last == 'x' || last == 'X') {
-			sum += 10; // add 10 if x
-		} else { // just add the digit
+
+		// add 10 if it's an x otherwise, just add the last digit
+		switch (last) {
+		case 'x':
+		case 'X':
+			sum += 10;
+			break;
+		default:
 			sum += last - '0';
 		}
+
+		// return modulo 11 of sum
 		return sum % 11 == 0;
 	}
 
