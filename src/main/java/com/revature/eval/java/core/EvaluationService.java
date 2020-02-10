@@ -149,6 +149,9 @@ public class EvaluationService {
 	public int getScrabbleScore(String string) {
 		// convert to upper case because that's how I wrote the switch statement below
 		final String upper = string.toUpperCase();
+
+		// if upper contains anything other than upper case characters, this isn't a
+		// valid scrabble word.
 		if (!upper.matches("\\p{Upper}+"))
 			throw new IllegalArgumentException("invalide scrabble string: " + string);
 
