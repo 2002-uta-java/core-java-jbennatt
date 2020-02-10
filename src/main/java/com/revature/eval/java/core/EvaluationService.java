@@ -444,7 +444,9 @@ public class EvaluationService {
 		for (final String blend : BLENDS_DIGRAPHS_TRIGRAPHS_OH_MY) {
 			if (word.indexOf(blend) == 0) {
 				// remove blend from beginning of word
-				word = word.replace(blend, "");
+				// need to use "replaceFirst" because just using "replace" will replace all
+				// instances of the blend (if it appears more than once)
+				word = word.replaceFirst(blend, "");
 				// add to the end
 				return word + blend + "ay";
 			}
