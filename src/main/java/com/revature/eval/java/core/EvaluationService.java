@@ -113,7 +113,7 @@ public class EvaluationService {
 			this.sideThree = sideThree;
 		}
 
-		// all three sides should be equal (you transitive property to only test 1 and
+		// all three sides should be equal (use transitive property to only test 1 and
 		// 2, then 2 and 3)
 		public boolean isEquilateral() {
 			return sideOne == sideTwo && sideTwo == sideThree;
@@ -149,19 +149,15 @@ public class EvaluationService {
 	public int getScrabbleScore(String string) {
 		// convert to upper case because that's how I wrote the switch statement below
 		final String upper = string.toUpperCase();
+		if (!upper.matches("\\p{Upper}+"))
+			throw new IllegalArgumentException("invalide scrabble string: " + string);
 
 		int score = 0;
 		final int len = string.length();
 
 		// iterate through each character in string
 		for (int i = 0; i < len; ++i) {
-			final char c = upper.charAt(i);
-
-			// check to make sure this is a valid word
-			if (Character.isAlphabetic(c))
-				score += getScrabbleScore(c);
-			else
-				throw new IllegalArgumentException("Invalid Scrabble word (contains non-alpha characters): " + string);
+			score += getScrabbleScore(upper.charAt(i));
 		}
 
 		return score;
