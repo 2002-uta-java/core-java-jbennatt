@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EvaluationService {
 
@@ -1017,7 +1019,50 @@ public class EvaluationService {
 	public static final int MINUS = 1;
 	public static final int MULT = 2;
 	public static final int DIVIDE = 3;
-	public static final String[] OPERATORS = { "plus", "minus", "multiplied by", "divided by" };
+
+	// setup map so that we can get to the operation without having to do a search
+	public static final Map<String, Integer> OPERATION_MAP = new HashMap<String, Integer>(4);
+
+	/**
+	 * I'm using a regex to match the entire input string for math operations (after
+	 * I switch to lower case). The below goes through each piece of the regex. The
+	 * idea is pretty simple, grab three groups: 1) left operand, 2) operation, and
+	 * 3) right operand (trim off of the rest).
+	 * 
+	 * "\Awhat\sis\s" (really "what is"):
+	 * 
+	 * The first part matches the beginning of the string and starts with "what is "
+	 * <-- I use white space instead of literal spaces and there can be as many as
+	 * you want.
+	 * 
+	 * (-?[\\d]+) - +/- integer, left operand (1st group)
+	 * 
+	 * I then match a positive or negative integer (which could actually start with
+	 * a 0 but who cares).
+	 * 
+	 * (\\s+[^\\d]+\\s+) - operation (2nd group)
+	 * 
+	 * Then I match not digits in between surrounded by whitespace (which I will
+	 * trim off below).
+	 * 
+	 * (-?[\\d]+) - same as right operand (3rd group)
+	 * 
+	 * Finally I match the last integer (positive or negative).
+	 * 
+	 * "\?\z"
+	 * 
+	 * Finally I match the end of input with a lone "?" and the end of input (\z).
+	 */
+	public static final Pattern MATH_PATTERN = Pattern
+			.compile("\\Awhat\\s+is\\s+(-?\\d+)(\\s[^\\d]+\\s)(-?\\d+)\\?\\z");
+
+	// setup map
+	static {
+		OPERATION_MAP.put("plus", PLUS);
+		OPERATION_MAP.put("minus", MINUS);
+		OPERATION_MAP.put("multiplied by", MULT);
+		OPERATION_MAP.put("divided by", DIVIDE);
+	}
 
 	/**
 	 * 20. Parse and evaluate simple math word problems returning the answer as an
@@ -1047,41 +1092,42 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int solveWordProblem(String string) {
-		string = string.toLowerCase();
-		// remove "what is" from the beginning (hopefully anyway) and the question mark
-		string = string.replace("what is", "");
-		string = string.replace("?", "").trim();
-		for (int i = 0; i < OPERATORS.length; ++i) {
-			final int front = string.indexOf(OPERATORS[i]);
+		// trm off leading/trailing whitespace then convert to lower case
+		string = string.trim().toLowerCase();
 
-			if (front >= 0) {
-				final String left = string.substring(0, front).trim();
-				final String right = string.substring(front + OPERATORS[i].length()).trim();
+		// create matcher for this string
+		final Matcher matcher = MATH_PATTERN.matcher(string);
 
-				if (left.matches("^-?\\d+$") && right.matches("^-?\\d+$")) {
-					final int a = Integer.parseInt(left);
-					final int b = Integer.parseInt(right);
+		// if it doesn't match my regex, it's not a recognized request
+		if (!matcher.matches())
+			throw new IllegalArgumentException("Unrecognized request: " + string);
 
-					switch (i) {
-					case PLUS:
-						return a + b;
-					case MINUS:
-						return a - b;
-					case MULT:
-						return a * b;
-					case DIVIDE:
-						return a / b;
-					default:
-						throw new IllegalArgumentException("unknown operation"); // this shouldn't happen
-					}
-				} else {
-					// this means you couldn't properly parse the left or right number
-					throw new IllegalArgumentException("Invalid input: arguments are not integers: " + string);
-				}
-			}
+		// group 1 is the left operand, group 2 is the operation, and group 3 is the
+		// right operand
+		final int leftOperand = Integer.parseInt(matcher.group(1));
+		final int rightOperand = Integer.parseInt(matcher.group(3));
+		final String operand = matcher.group(2).trim();
+
+		// use operation map to jump to the operation, if this returns null, I can't put
+		// it into my switch statement below so catch that case here.
+		final Integer op = OPERATION_MAP.get(operand);
+
+		if (op == null)
+			throw new IllegalArgumentException("Unrecognized operation: " + operand);
+
+		// switch on the integer values
+		switch (op) {
+		case PLUS:
+			return leftOperand + rightOperand;
+		case MINUS:
+			return leftOperand - rightOperand;
+		case MULT:
+			return leftOperand * rightOperand;
+		case DIVIDE:
+			return leftOperand / rightOperand;
+		default:
+			// this isn't going to happen
+			throw new IllegalArgumentException("Unknown operation: " + operand);
 		}
-
-		throw new IllegalArgumentException("Invalid input: unrecognized operator: " + string);
 	}
-
 }
