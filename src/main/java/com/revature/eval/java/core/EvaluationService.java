@@ -1107,7 +1107,7 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int solveWordProblem(String string) {
-		// trm off leading/trailing whitespace then convert to lower case
+		// trim off leading/trailing whitespace then convert to lower case
 		string = string.trim().toLowerCase();
 
 		// create matcher for this string
