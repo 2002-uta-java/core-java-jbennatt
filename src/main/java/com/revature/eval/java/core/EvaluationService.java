@@ -976,67 +976,33 @@ public class EvaluationService {
 	public boolean isLuhnValid(String string) {
 		// remove all white space
 		string = string.replaceAll("\\s+", "");
+
 		// strip out all non-digits (this shouldn't do anything for a valid Luhn Number
 		// String. I can't just do this from the beginning because I need to know
 		// whether or not there are invalid characters (i.e. non-digits) in the string
 		final String digits = string.replaceAll("[^\\d]+", "");
-
-		// save length of digits for later
-		final int len = digits.length();
+		final int len = digits.length();// save length of digits for later
 
 		// if the replaceAll above actually removed anything, it's not a valid Luhn
-		// Number String. It's also invalid if it's only of length 1.
-		if (len != string.length() || len <= 1)
+		// Number String. It's also invalid if it's only of length 1 or of even length
+		// (the first digit is supposed to be the check digit and shouldn't be included
+		// in the sum)
+		if (len <= 1 || len != string.length() || len % 2 != 1)
 			return false;
-		// else validate Luhn Number String
+//		// else validate Luhn Number String
 
-		// handle fence post (get first--really last--digit) then below every subsequent
-		// digit is guaranteed to have a "previous" (which is really the next digit).
-		int sum = doubleLuhnNumber(digits.charAt(len - 1));
+		int sum = 0;
 
-		for (int i = len - 3; i >= 0; i -= 2) {
+		// start with the second digit (ignore the first, check digit)
+		for (int i = 1; i < len; i += 2) {
+			// double every second digit (subtract 9 if greater than 9
 			sum += doubleLuhnNumber(digits.charAt(i));
+			// I'm guaranteed to have this "next" digit because I checked above that the
+			// number of digits is odd.
 			sum += digits.charAt(i + 1) - '0';
 		}
 
 		return sum % 10 == 0;
-		// TODO This isnt working
-
-		// needs to be more than one digit (if there is only one digit but also invalid
-		// characters it will fail below)
-//		if (string.length() <= 1)
-//			return false;
-
-//		final int len = string.length();
-//
-//		int sum = 0;
-//
-//		char c = string.charAt(len - 1);
-//
-//		// handle fence post (get first--really last--digit) then below every subsequent
-//		// digit is guaranteed to have a "previous" (which is really the next digit).
-//		if (Character.isDigit(c))
-//			sum += doubleLuhnNumber(c);
-//		else
-//			return false; // found an invalid character
-//
-//		for (int i = len - 3; i >= 0; i -= 2) {
-//			// check the previous character
-//			final char cPrev = string.charAt(i + 1);
-//			if (Character.isDigit(cPrev))
-//				sum += c - '0';
-//			else
-//				return false;
-//
-//			c = string.charAt(i);
-//
-//			if (Character.isDigit(c))
-//				sum += doubleLuhnNumber(c);
-//			else
-//				return false;
-//		}
-//
-//		return sum % 10 == 0;
 	}
 
 	// this assumes c is a valid digit
@@ -1084,7 +1050,7 @@ public class EvaluationService {
 		string = string.toLowerCase();
 		// remove "what is" from the beginning (hopefully anyway) and the question mark
 		string = string.replace("what is", "");
-		string = string.replace("?", "");
+		string = string.replace("?", "").trim();
 		for (int i = 0; i < OPERATORS.length; ++i) {
 			final int front = string.indexOf(OPERATORS[i]);
 
