@@ -442,7 +442,7 @@ public class EvaluationService {
 		}
 		// else see if it's a blend
 		for (final String blend : BLENDS_DIGRAPHS_TRIGRAPHS_OH_MY) {
-			if (word.indexOf(blend) == 0) {
+			if (word.startsWith(blend)) {
 				// remove blend from beginning of word
 				// need to use "replaceFirst" because just using "replace" will replace all
 				// instances of the blend (if it appears more than once)
