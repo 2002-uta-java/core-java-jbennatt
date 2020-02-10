@@ -492,6 +492,10 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isArmstrongNumber(int input) {
+		// an armstrong number must be a natural number (i.e. non-negative)
+		if (input < 0)
+			return false;
+
 		// get the number of digits by taking the log base 10. Think about it:
 		// log_{10}(100) = 2 but it's 3 digits, so need to add 1. 500 is 2.??? so I
 		// still need to add one and then the cast to an int will round it down.
